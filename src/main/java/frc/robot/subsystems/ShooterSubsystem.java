@@ -22,7 +22,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private SparkMax m_sparkMaxMotor;
   private DutyCycleOut m_dutyCycleRequest;
   private final Constants.ShooterConstants.MotorType m_motorType;
-  private ShooterState m_currentState;
+  private boolean m_isFiring;
+  private ShooterState m_currentShooterSpeed = ShooterState.SPEED_05; //Initial speed should be low
 
   public ShooterSubsystem() {
     m_motorType = Constants.ShooterConstants.kMotorType;
@@ -36,7 +37,9 @@ public class ShooterSubsystem extends SubsystemBase {
           ? InvertedValue.Clockwise_Positive 
           : InvertedValue.CounterClockwise_Positive;
       m_talonFXMotor.getConfigurator().apply(motorConfig);
+
     } else {
+      
       m_sparkMaxMotor = new SparkMax(Constants.kMotorPort, SparkLowLevel.MotorType.kBrushless);
       m_dutyCycleRequest = null;
       
@@ -46,30 +49,44 @@ public class ShooterSubsystem extends SubsystemBase {
     }
   }
 
-  public void setState(ShooterState state) {
-    m_currentState = state;
-    
-    if (m_motorType == Constants.ShooterConstants.MotorType.TALONFX) {
-      m_talonFXMotor.setControl(m_dutyCycleRequest.withOutput(state.getSpeed()));
-    } else {
-      m_sparkMaxMotor.set(state.getSpeed());
-    }
-  }
-
   public void fire() {
-    setState(ShooterState.FIRE);
-  }
-
-  public void reverse() {
-    setState(ShooterState.REVERSE);
+    setSpeed(m_currentShooterSpeed.getSpeed());
+    m_isFiring = true;
   }
 
   public void stop() {
-    setState(ShooterState.STOP);
+    setSpeed(0.0);
+    m_isFiring = false;
   }
 
-  public ShooterState getState() {
-    return m_currentState;
+  public void increaseSpeed() {
+    m_currentShooterSpeed = m_currentShooterSpeed.increase();
+    if (m_isFiring) {
+      fire();
+    }
+  }
+
+  public void decreaseSpeed() {
+    m_currentShooterSpeed = m_currentShooterSpeed.decrease();
+    if (m_isFiring) {
+      fire();
+    }
+  }
+
+  public ShooterState getCurrentShooterSpeed() {
+    return m_currentShooterSpeed;
+  }
+
+  public boolean isFiring() {
+    return m_isFiring;
+  }
+
+  private void setSpeed(double speed) {
+    if (m_motorType == Constants.ShooterConstants.MotorType.TALONFX) {
+      m_talonFXMotor.setControl(m_dutyCycleRequest.withOutput(speed));
+    } else {
+      m_sparkMaxMotor.set(speed);
+    }
   }
 
   @Override

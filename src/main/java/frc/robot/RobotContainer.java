@@ -4,9 +4,10 @@
 
 package frc.robot;
 
-
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -20,22 +21,32 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(Constants.kDriverControllerPort);
+      new CommandXboxController(0);
 
-  // Commands
   private final ShooterCommands.Fire m_shooterFireCommand;
-  private final ShooterCommands.Reverse m_shooterReverseCommand;
   private final ShooterCommands.Stop m_shooterStopCommand;
+  private final ShooterCommands.IncreaseSpeed m_shooterIncreaseSpeedCommand;
+  private final ShooterCommands.DecreaseSpeed m_shooterDecreaseSpeedCommand;
+  private final IntakeCommands.Input m_intakeInputCommand;
+  private final IntakeCommands.Reverse m_intakeReverseCommand;
+  private final IntakeCommands.Stop m_intakeStopCommand;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Initialize commands
+
     m_shooterFireCommand = new ShooterCommands.Fire(m_shooterSubsystem);
-    m_shooterReverseCommand = new ShooterCommands.Reverse(m_shooterSubsystem);
     m_shooterStopCommand = new ShooterCommands.Stop(m_shooterSubsystem);
+
+    m_shooterIncreaseSpeedCommand = new ShooterCommands.IncreaseSpeed(m_shooterSubsystem);
+    m_shooterDecreaseSpeedCommand = new ShooterCommands.DecreaseSpeed(m_shooterSubsystem);
+
+    m_intakeInputCommand = new IntakeCommands.Input(m_intakeSubsystem);
+    m_intakeReverseCommand = new IntakeCommands.Reverse(m_intakeSubsystem);
+    m_intakeStopCommand = new IntakeCommands.Stop(m_intakeSubsystem);
 
     // Configure the trigger bindings
     configureBindings();
@@ -51,15 +62,19 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Right trigger fires the shooter (when pressed beyond threshold)
-    Trigger rightTrigger = new Trigger(() -> m_driverController.getRightTriggerAxis() > 0.1);
-    rightTrigger.whileTrue(m_shooterFireCommand);
-    rightTrigger.onFalse(m_shooterStopCommand);
+    m_driverController.rightTrigger().whileTrue(m_shooterFireCommand);
+    m_driverController.rightTrigger().onFalse(m_shooterStopCommand);
 
-    // Left trigger reverses the shooter slowly (for removing items)
-    Trigger leftTrigger = new Trigger(() -> m_driverController.getLeftTriggerAxis() > 0.1);
-    leftTrigger.whileTrue(m_shooterReverseCommand);
-    leftTrigger.onFalse(m_shooterStopCommand);
+    m_driverController.povUp().onTrue(m_shooterIncreaseSpeedCommand);
+    m_driverController.povDown().onTrue(m_shooterDecreaseSpeedCommand);
+
+    m_driverController.rightBumper().whileTrue(m_intakeInputCommand);
+    m_driverController.rightBumper().onFalse(m_intakeStopCommand);
+
+    m_driverController.leftBumper().whileTrue(m_intakeReverseCommand);
+    m_driverController.leftBumper().onFalse(m_intakeStopCommand);
+    
+    m_driverController.a().onTrue(m_intakeStopCommand);
   }
 
   /**

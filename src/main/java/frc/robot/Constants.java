@@ -14,7 +14,7 @@ package frc.robot;
  */
 public final class Constants {
     public static final int kDriverControllerPort = 0;
-    public static final int kMotorPort = 1;
+    public static final int kMotorPort = 22;
     public static final boolean kShooterInverted = false;
     
     public static class ShooterConstants {
@@ -22,6 +22,16 @@ public final class Constants {
             TALONFX,
             SPARKMAX
         }
-        public static final MotorType kMotorType = MotorType.TALONFX; // Change to SPARKMAX for Kraken motor ;)
+        public static final MotorType kMotorType = MotorType.TALONFX;
+    }
+
+    public static class IntakeConstants {
+        public enum MotorType {
+            TALONFX,
+            SPARKMAX
+        }
+        public static final MotorType kMotorType = MotorType.TALONFX;
+        public static final int kIntakeMotorID = 2;
+        public static final boolean kIntakeInverted = false;
     }
 }
