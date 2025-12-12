@@ -23,7 +23,6 @@ public class RobotContainer {
   private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(0);
 
@@ -73,7 +72,7 @@ public class RobotContainer {
 
     m_driverController.leftBumper().whileTrue(m_intakeReverseCommand);
     m_driverController.leftBumper().onFalse(m_intakeStopCommand);
-    
+
     m_driverController.a().onTrue(m_intakeStopCommand);
   }
 
