@@ -36,22 +36,32 @@ public class IntakeSubsystem extends SubsystemBase {
           ? InvertedValue.Clockwise_Positive 
           : InvertedValue.CounterClockwise_Positive;
       m_talonFXMotor.getConfigurator().apply(motorConfig);
-    } else {
+    } else if (m_motorType == Constants.IntakeConstants.MotorType.SPARKMAX) {
       m_sparkMaxMotor = new SparkMax(Constants.IntakeConstants.kIntakeMotorID, SparkLowLevel.MotorType.kBrushless);
       m_dutyCycleRequest = null;
       
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(Constants.IntakeConstants.kIntakeInverted);
       m_sparkMaxMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    } else if (m_motorType == Constants.IntakeConstants.MotorType.KRAKEN) {
+      m_talonFXMotor = new TalonFX(Constants.IntakeConstants.kIntakeMotorID);
+      m_dutyCycleRequest = new DutyCycleOut(0);
+      
+      TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+      motorConfig.MotorOutput.Inverted = Constants.IntakeConstants.kIntakeInverted 
+          ? InvertedValue.Clockwise_Positive 
+          : InvertedValue.CounterClockwise_Positive;
+      m_talonFXMotor.getConfigurator().apply(motorConfig);
     }
   }
 
   public void setState(IntakeState state) {
     m_currentState = state;
     
-    if (m_motorType == Constants.IntakeConstants.MotorType.TALONFX) {
+    if (m_motorType == Constants.IntakeConstants.MotorType.TALONFX || 
+        m_motorType == Constants.IntakeConstants.MotorType.KRAKEN) {
       m_talonFXMotor.setControl(m_dutyCycleRequest.withOutput(state.getSpeed()));
-    } else {
+    } else if (m_motorType == Constants.IntakeConstants.MotorType.SPARKMAX) {
       m_sparkMaxMotor.set(state.getSpeed());
     }
   }

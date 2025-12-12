@@ -23,7 +23,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private DutyCycleOut m_dutyCycleRequest;
   private final Constants.ShooterConstants.MotorType m_motorType;
   private boolean m_isFiring;
-  private ShooterState m_currentShooterSpeed = ShooterState.SPEED_05; //Initial speed should be low
+  private ShooterState m_currentShooterSpeed = ShooterState.SPEED_05;
 
   public ShooterSubsystem() {
     m_motorType = Constants.ShooterConstants.kMotorType;
@@ -38,14 +38,22 @@ public class ShooterSubsystem extends SubsystemBase {
           : InvertedValue.CounterClockwise_Positive;
       m_talonFXMotor.getConfigurator().apply(motorConfig);
 
-    } else {
-      
+    } else if (m_motorType == Constants.ShooterConstants.MotorType.SPARKMAX) {
       m_sparkMaxMotor = new SparkMax(Constants.kMotorPort, SparkLowLevel.MotorType.kBrushless);
       m_dutyCycleRequest = null;
       
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(Constants.kShooterInverted);
       m_sparkMaxMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    } else if (m_motorType == Constants.ShooterConstants.MotorType.KRAKEN) {
+      m_talonFXMotor = new TalonFX(Constants.kMotorPort);
+      m_dutyCycleRequest = new DutyCycleOut(0);
+      
+      TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+      motorConfig.MotorOutput.Inverted = Constants.kShooterInverted 
+          ? InvertedValue.Clockwise_Positive 
+          : InvertedValue.CounterClockwise_Positive;
+      m_talonFXMotor.getConfigurator().apply(motorConfig);
     }
   }
 
@@ -82,9 +90,10 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   private void setSpeed(double speed) {
-    if (m_motorType == Constants.ShooterConstants.MotorType.TALONFX) {
+    if (m_motorType == Constants.ShooterConstants.MotorType.TALONFX || 
+        m_motorType == Constants.ShooterConstants.MotorType.KRAKEN) {
       m_talonFXMotor.setControl(m_dutyCycleRequest.withOutput(speed));
-    } else {
+    } else if (m_motorType == Constants.ShooterConstants.MotorType.SPARKMAX) {
       m_sparkMaxMotor.set(speed);
     }
   }

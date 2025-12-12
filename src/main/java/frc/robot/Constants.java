@@ -20,7 +20,8 @@ public final class Constants {
     public static class ShooterConstants {
         public enum MotorType {
             TALONFX,
-            SPARKMAX
+            SPARKMAX,
+            KRAKEN
         }
         public static final MotorType kMotorType = MotorType.TALONFX;
     }
@@ -28,7 +29,8 @@ public final class Constants {
     public static class IntakeConstants {
         public enum MotorType {
             TALONFX,
-            SPARKMAX
+            SPARKMAX,
+            KRAKEN
         }
         public static final MotorType kMotorType = MotorType.TALONFX;
         public static final int kIntakeMotorID = 2;
