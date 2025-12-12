@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.spark.SparkMax;
@@ -32,8 +32,8 @@ public class ShooterSubsystem extends SubsystemBase {
       m_talonFXMotor = new TalonFX(Constants.kMotorPort);
       m_dutyCycleRequest = new DutyCycleOut(0);
       
-      MotorOutputConfigs motorConfig = new MotorOutputConfigs();
-      motorConfig.Inverted = Constants.kShooterInverted 
+      TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+      motorConfig.MotorOutput.Inverted = Constants.kShooterInverted 
           ? InvertedValue.Clockwise_Positive 
           : InvertedValue.CounterClockwise_Positive;
       m_talonFXMotor.getConfigurator().apply(motorConfig);

@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.spark.SparkMax;
@@ -31,8 +31,8 @@ public class IntakeSubsystem extends SubsystemBase {
       m_talonFXMotor = new TalonFX(Constants.IntakeConstants.kIntakeMotorID);
       m_dutyCycleRequest = new DutyCycleOut(0);
       
-      MotorOutputConfigs motorConfig = new MotorOutputConfigs();
-      motorConfig.Inverted = Constants.IntakeConstants.kIntakeInverted 
+      TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+      motorConfig.MotorOutput.Inverted = Constants.IntakeConstants.kIntakeInverted 
           ? InvertedValue.Clockwise_Positive 
           : InvertedValue.CounterClockwise_Positive;
       m_talonFXMotor.getConfigurator().apply(motorConfig);
